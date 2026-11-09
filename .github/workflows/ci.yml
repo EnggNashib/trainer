@@ -9,10 +9,13 @@ jobs:
   no-dependencies:
     # The validator, the mobile plan and the logger must work with nothing
     # installed — that is what makes them reliable in a sandbox with no network.
-    runs-on: ubuntu-latest
+    # 3.9 is the stated floor, and only the older runner image still ships it.
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python: ["3.9", "3.12"]
+        include:
+          - { os: ubuntu-22.04, python: "3.9" }
+          - { os: ubuntu-latest, python: "3.13" }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
