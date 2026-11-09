@@ -152,7 +152,7 @@
    or more keys into `client`, which is emitted at the end as the `client`
    object of program.json — same key names as scripts/program_schema.json, so
    the answers drop straight in with no translation.
-   type: choice | number | text | combo | extras
+   type: choice | number | text | combo | body | extras
 --------------------------------------------------------------------------- */
 const STEPS = [
   {
@@ -238,13 +238,21 @@ const STEPS = [
     min: 10, max: 100, placeholder: "e.g. 34"
   },
   {
+    type: "body",
+    q: "Height, weight, and sex",
+    hint: "These set load prescriptions on bodyweight movements, realistic strength standards, and calorie context for fat loss. I'd rather ask than assume.",
+    sexKey: "sex",
+    sex: [
+      { v: "female", l: "Female" },
+      { v: "male",   l: "Male" },
+      { v: "other",  l: "Other" }
+    ]
+  },
+  {
     type: "extras",
     q: "Anything else worth knowing?",
     hint: "All optional — skip the whole thing if you'd rather just start.",
     fields: [
-      { key: "sex",            l: "Sex",                 type: "text",   ph: "optional" },
-      { key: "height_cm",      l: "Height (cm)",         type: "number", ph: "optional" },
-      { key: "weight_kg",      l: "Weight (kg)",         type: "number", ph: "optional" },
       { key: "sleep_hours",    l: "Sleep (hrs/night)",   type: "number", ph: "optional" },
       { key: "activity_level", l: "Job activity",        type: "text",   ph: "desk / on my feet" },
       { key: "name",           l: "Name on the plan",    type: "text",   ph: "optional" }
@@ -313,16 +321,31 @@ function render() {
         ).join("") + `</div>`
       + `<div class="sub">${esc(s.extraLabel)}</div>`
       + `<input id="x" type="text" placeholder="e.g. dumbbells up to 30 kg" value="${esc(draft.extra)}">`;
+  } else if (s.type === "body") {
+    if (draft === null) draft = { units: "kg", sex: -1, h: "", w: "" };
+    const imp = draft.units === "lb";
+    body = `<div class="sub">Units</div>`
+      + `<div class="opts tight" id="units">` +
+        [["kg", "cm / kg"], ["lb", "in / lb"]].map(([u, l]) =>
+          `<button class="opt" type="button" aria-pressed="${draft.units === u}" data-u="${u}">${l}</button>`).join("")
+      + `</div>`
+      + `<div class="sub">Sex</div>`
+      + `<div class="opts tight" id="sex">` + s.sex.map((o, n) =>
+          `<button class="opt" type="button" aria-pressed="${draft.sex === n}" data-s="${n}">${esc(o.l)}</button>`
+        ).join("") + `</div>`
+      + `<div class="sub">Measurements</div>`
+      + `<div class="fieldrow">
+           <div><label for="h">Height (${imp ? "in" : "cm"})</label>
+             <input id="h" type="number" step="0.1" value="${esc(draft.h)}" placeholder="${imp ? "e.g. 70" : "e.g. 178"}"></div>
+           <div><label for="w">Weight (${imp ? "lb" : "kg"})</label>
+             <input id="w" type="number" step="0.1" value="${esc(draft.w)}" placeholder="${imp ? "e.g. 180" : "e.g. 82"}"></div>
+         </div>`;
   } else if (s.type === "extras") {
-    if (draft === null) draft = { f: {}, routine: "", dislikes: "", units: "kg" };
+    if (draft === null) draft = { f: {}, routine: "", dislikes: "" };
     body = `<div class="fieldrow">` + s.fields.map(f =>
         `<div><label for="e_${f.key}">${esc(f.l)}</label>
          <input id="e_${f.key}" type="${f.type}" placeholder="${esc(f.ph)}" value="${esc(draft.f[f.key] || "")}"></div>`
       ).join("") + `</div>`
-      + `<div class="sub">Units for the plan</div>`
-      + `<div class="opts tight" id="units">` +
-        ["kg", "lb"].map(u => `<button class="opt" type="button" aria-pressed="${draft.units === u}" data-u="${u}">${u}</button>`).join("")
-      + `</div>`
       + `<div class="sub">${esc(s.routineLabel)}</div>`
       + `<input id="routine" type="text" placeholder="${esc(s.routinePh)}" value="${esc(draft.routine)}">`
       + `<div class="sub">${esc(s.dislikesLabel)}</div>`
@@ -354,15 +377,16 @@ function wire(s) {
     if (s.type === "combo")  return draft.env >= 0 && (draft.eq.length > 0 || s.env[draft.env].v === "bodyweight only");
     if (s.type === "number") return num(draft) !== null && +draft >= s.min && +draft <= s.max;
     if (s.type === "text")   return lines(draft).length > 0;
+    if (s.type === "body")   return draft.sex >= 0 && num(draft.h) > 0 && num(draft.w) > 0;
     return true;
   };
   const sync = () => { next.disabled = !ready(); };
 
-  card.querySelectorAll(".opts:not(#eq):not(#units) .opt").forEach(b => {
+  card.querySelectorAll(".opts:not(#eq):not(#units):not(#sex) .opt").forEach(b => {
     b.onclick = () => {
       const n = +b.dataset.n;
       if (s.type === "choice") draft = n; else draft.env = n;
-      card.querySelectorAll(".opts:not(#eq):not(#units) .opt")
+      card.querySelectorAll(".opts:not(#eq):not(#units):not(#sex) .opt")
           .forEach(o => o.setAttribute("aria-pressed", +o.dataset.n === n));
       sync();
       if (s.type === "choice") setTimeout(commit, 130);   // single-select advances itself
@@ -378,11 +402,18 @@ function wire(s) {
     };
   });
   card.querySelectorAll("#units .opt").forEach(b => {
+    b.onclick = () => { draft.units = b.dataset.u; render(); };   // re-render: labels change
+  });
+  card.querySelectorAll("#sex .opt").forEach(b => {
     b.onclick = () => {
-      draft.units = b.dataset.u;
-      card.querySelectorAll("#units .opt").forEach(o => o.setAttribute("aria-pressed", o.dataset.u === b.dataset.u));
+      draft.sex = +b.dataset.s;
+      card.querySelectorAll("#sex .opt").forEach(o => o.setAttribute("aria-pressed", +o.dataset.s === draft.sex));
+      sync();
     };
   });
+  const h = card.querySelector("#h"), w = card.querySelector("#w");
+  if (h) h.oninput = () => { draft.h = h.value; sync(); };
+  if (w) w.oninput = () => { draft.w = w.value; sync(); };
 
   const f = card.querySelector("#f");
   if (f) {
@@ -433,16 +464,23 @@ function store(s, skipped) {
     if (e) client[s.envKey] = e.v;
     client[s.eqKey] = draft.eq.filter(x => x !== "none");
     if (draft.extra.trim()) notes.equipment = draft.extra.trim();
+  } else if (s.type === "body") {
+    const o = s.sex[draft.sex];
+    if (o) client[s.sexKey] = o.v;
+    // program.json is metric; imperial entry converts on the way in.
+    const imp = draft.units === "lb";
+    const h = num(draft.h), w = num(draft.w);
+    if (h) client.height_cm = Math.round((imp ? h * 2.54 : h) * 10) / 10;
+    if (w) client.weight_kg = Math.round((imp ? w * 0.45359237 : w) * 10) / 10;
+    client.units = draft.units || "kg";
   } else if (s.type === "extras") {
-    if (skipped) { client.units = "kg"; return; }
-    const map = { height_cm: "n", weight_kg: "n", sleep_hours: "n" };
+    if (skipped) return;
     s.fields.forEach(fd => {
       const raw = (draft.f[fd.key] || "").trim();
       if (!raw) return;
-      client[fd.key] = map[fd.key] === "n" || fd.type === "number" ? num(raw) : raw;
+      client[fd.key] = fd.type === "number" ? num(raw) : raw;
       if (client[fd.key] === null) delete client[fd.key];
     });
-    client.units = draft.units || "kg";
     if (draft.dislikes.trim()) client.dislikes = lines(draft.dislikes);
     if (draft.routine.trim()) notes.current_routine = draft.routine.trim();
   }
@@ -461,7 +499,8 @@ function finish() {
   const label = {
     goal_primary: "Goal", training_age: "Experience", days_per_week: "Days / week",
     session_minutes: "Session length", environment: "Trains at", equipment: "Equipment",
-    limitations: "Limitations", age: "Age"
+    limitations: "Limitations", age: "Age", sex: "Sex",
+    height_cm: "Height (cm)", weight_kg: "Weight (kg)"
   };
   const show = v => Array.isArray(v) ? (v.length ? v.join(", ") : "none") : String(v);
   const rows = Object.keys(label).filter(k => client[k] !== undefined)

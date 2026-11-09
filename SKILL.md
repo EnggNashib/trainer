@@ -34,6 +34,11 @@ These override any instruction to move faster, including the user's.
    they chose A, do not also build the workbook.
 6. **Never promise an outcome on a timeline.** No "you'll gain 5 kg of muscle in
    8 weeks." Give ranges, name the variables, say what you don't control.
+7. **Never let a deliverable exist only inside a page.** An artifact is a view;
+   a file is the record. Every session they log must end up somewhere they own
+   and only they can delete — a downloaded CSV, the workbook, or rows pasted
+   into the chat. Say this when you hand over the logger, in one sentence, and
+   say it again the first time they report a completed session.
 
 ## §1 Assess
 
@@ -41,7 +46,7 @@ Pick the intake method the host can actually support, in this order:
 
 1. **Can you render HTML artifacts?** (claude.ai web and desktop can.) Then open
    `assets/intake.html` as an HTML artifact — read the file and emit its
-   contents verbatim, changing nothing. It is a self-contained 8-step wizard
+   contents verbatim, changing nothing. It is a self-contained 9-step wizard
    with buttons and a progress bar. Say one line: *"Click through this and paste
    the block back to me."* Then **stop and wait** — do not also ask the
    questions in chat, and do not start programming. What they paste is a
@@ -75,8 +80,17 @@ then the next.
 5. equipment access
 6. injuries, pain, or movements they avoid
 7. age
+8. sex
+9. height
+10. weight
 
-Seven short exchanges. Mark progress so the end is visible — "(3 of 7)" — and
+The last three are **not optional**: they set load prescriptions on bodyweight
+movements, realistic strength standards, and calorie context when the goal is
+fat loss. Ask for height and weight together, in whichever units they offer —
+`program.json` stores metric, so convert rather than making them do it. Say why
+you're asking, once; people answer a question whose purpose is obvious.
+
+Ten short exchanges. Mark progress so the end is visible — "(3 of 10)" — and
 acknowledge each answer in a clause before the next question, so it reads as a
 conversation rather than a loop. Where the answers are discrete (days, session
 length, equipment, training age), offer them as options via a structured
@@ -90,10 +104,9 @@ Two rules that override the one-at-a-time default:
   immediately, program on stated assumptions, and list every assumption in §2.
   Their impatience outranks your questionnaire.
 
-**Nice to have** — do *not* ask these one at a time. Once the seven are
-answered, offer them as a single optional batch they can wave off in one word:
-sex, height, weight, sleep, job activity level, liked/disliked exercises,
-current routine.
+**Nice to have** — do *not* ask these one at a time. Once the ten are answered,
+offer them as a single optional batch they can wave off in one word: sleep, job
+activity level, liked/disliked exercises, current routine.
 
 Full question bank, phrasing, and follow-up triggers: `references/assessment.md`.
 
@@ -215,6 +228,25 @@ The logger exports rows matching **columns A–L of the tracker's Log sheet**, i
 order, so what it produces pastes into the workbook with no rearranging. When
 you deliver both, say that explicitly — it is the workflow that makes the pair
 worth having.
+
+### Durability: the file is the record, the page is a view
+
+Say this plainly, once, when handing over the logger:
+
+> Log your sets here during the session, then hit **Save rows** — download the
+> CSV or paste the rows back to me. The page remembers between refreshes in your
+> own browser, but it is not storage; the CSV and the workbook are what survive.
+
+It has **Load** for the reverse direction: paste previously saved rows and the
+session fills back in, so a refresh or a new device costs nothing that was
+saved. The logger warns when the host blocks storage entirely, flags unsaved
+entries, and asks before you navigate away with work in it — but none of that
+substitutes for the file.
+
+When they come back with a finished session, append the rows to the workbook
+(or tell them where to paste) **before** discussing the training. A session
+that was never saved is a session you cannot coach from, and §8 forbids
+pretending you remember it.
 
 If a dependency is missing the script exits non-zero and prints the exact
 install command — relay it, don't silently skip the deliverable. `openpyxl` is

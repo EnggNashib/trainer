@@ -9,7 +9,7 @@ formulas genuinely calculate.
 ## What makes it a system, not a generator
 
 - **Assessment before programming.** Where the host can render artifacts, an
-  8-step clickable intake wizard (`assets/intake.html`) whose output is a
+  9-step clickable intake wizard (`assets/intake.html`) whose output is a
   ready-made `client` object; everywhere else, one question per message like a
   conversation rather than a form. Nothing is invented; every assumption is
   stated in the plan.
@@ -81,6 +81,12 @@ In Claude Code you can also invoke it directly as `/trainer`.
 On claude.ai the two HTML deliverables are emitted as artifacts — they open in
 one click, and they are the two that cannot fail on a missing dependency.
 
+**Nothing important lives only in a page.** The logger keeps entries across
+refreshes where the browser allows it, but treats that as a convenience: it
+flags unsaved work, warns when the host blocks storage, and exports rows that
+match the workbook's Log sheet column for column. **Load** takes those rows
+back, so the file — not the page — is the record, and only you can delete it.
+
 Both scripts exit non-zero with the exact install command if a dependency is
 missing — they never silently skip a deliverable.
 
@@ -90,7 +96,7 @@ missing — they never silently skip a deliverable.
 trainer/
 ├── SKILL.md                    workflow, hard rules, quality gate
 ├── assets/
-│   └── intake.html             clickable 8-step intake wizard, zero dependencies
+│   └── intake.html             clickable 9-step intake wizard, zero dependencies
 ├── references/
 │   ├── assessment.md           question bank, follow-up triggers, classifying training age
 │   ├── programming.md          splits, volume, intensity, progression, deloads, cardio

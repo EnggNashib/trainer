@@ -160,6 +160,18 @@ HTML = """<title>{title}</title>
   pre {{ margin:0; padding:12px; background:var(--bg); border:1px solid var(--line);
     border-radius:7px; font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;
     overflow:auto; max-height:46vh; white-space:pre; }}
+  dialog textarea {{ width:100%; font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;
+    background:var(--bg); color:var(--ink); border:1px solid var(--line);
+    border-radius:7px; padding:10px; resize:vertical; }}
+  .unsaved {{ display:none; font-size:.76rem; font-weight:600; color:#B4541F;
+    background:#FDF0E7; border:1px solid #F0D3BE; border-radius:5px;
+    padding:3px 7px; margin-left:2px; white-space:nowrap; }}
+  @media (prefers-color-scheme: dark) {{
+    .unsaved {{ color:#F0B48A; background:#33231A; border-color:#4A3425; }}
+  }}
+  :root[data-theme="dark"] .unsaved {{ color:#F0B48A; background:#33231A; border-color:#4A3425; }}
+  :root[data-theme="light"] .unsaved {{ color:#B4541F; background:#FDF0E7; border-color:#F0D3BE; }}
+  .unsaved.on {{ display:inline-block; }}
   .row {{ display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }}
   .note {{ font-size:.76rem; color:var(--muted); margin-top:18px; text-align:center; }}
 </style>
@@ -181,19 +193,35 @@ HTML = """<title>{title}</title>
 
 <div class="bar">
   <span class="tally" id="tally"></span>
-  <button class="act" id="clear" type="button">Clear session</button>
-  <button class="act primary" id="export" type="button">Export rows</button>
+  <span class="unsaved" id="flag">unsaved</span>
+  <button class="act" id="load" type="button">Load</button>
+  <button class="act" id="clear" type="button">Clear</button>
+  <button class="act primary" id="export" type="button">Save rows</button>
 </div>
 
 <dialog id="dlg">
-  <h2>Rows for the tracker</h2>
-  <p>Paste into the Log sheet at the first empty row, column A. Columns match
-     A–L exactly; Volume and Est.&nbsp;1RM are formulas and fill themselves.</p>
+  <h2>Save this session</h2>
+  <p><b>This page is not storage.</b> Download the CSV, or copy the rows into
+     the chat or the workbook — then it's yours and only you can delete it.
+     Columns match the tracker's Log sheet A–L; Volume and Est.&nbsp;1RM are
+     formulas and fill themselves.</p>
   <pre id="out"></pre>
   <div class="row">
     <button class="act" id="csv" type="button">Download CSV</button>
     <button class="act" id="cp" type="button">Copy</button>
     <button class="act primary" id="close" type="button">Done</button>
+  </div>
+</dialog>
+
+<dialog id="imp">
+  <h2>Load a saved session</h2>
+  <p>Paste rows you exported earlier — CSV or tab-separated, with or without the
+     header line. Matching exercises in the current session are filled back in,
+     so a refresh costs you nothing you saved.</p>
+  <textarea id="impText" rows="8" placeholder="2026-11-09,1,Upper A,Bench press,4,6-10,3,8,60,2,150,Done"></textarea>
+  <div class="row">
+    <button class="act" id="impCancel" type="button">Cancel</button>
+    <button class="act primary" id="impGo" type="button">Load rows</button>
   </div>
 </dialog>
 
@@ -208,8 +236,27 @@ const esc = s => String(s).replace(/[&<>"']/g, c =>
 /* ---- state: {{ "<week>|<session>|<date>": {{ "<ex>|<set>": {{w,r,done}} }} }} ---- */
 const KEY = "trainer-log:" + P.program;
 let state = {{}};
-try {{ state = JSON.parse(localStorage.getItem(KEY) || "{{}}"); }} catch {{}}
-const save = () => {{ try {{ localStorage.setItem(KEY, JSON.stringify(state)); }} catch {{}} }};
+let storable = true;              // false when the host blocks localStorage
+let dirty = false;                // true when there are entries not yet exported
+try {{ state = JSON.parse(localStorage.getItem(KEY) || "{{}}"); }} catch {{ storable = false; }}
+
+function save() {{
+  try {{ localStorage.setItem(KEY, JSON.stringify(state)); }}
+  catch {{ storable = false; }}
+  dirty = true;
+  flag();
+}}
+function flag() {{
+  $("flag").classList.toggle("on", dirty);
+  $("note").textContent = storable
+    ? "Entries survive a refresh in this browser only. Save rows to keep them for good."
+    : "This page cannot store anything here — save rows before you leave, or they are gone.";
+}}
+addEventListener("beforeunload", ev => {{
+  if (!dirty) return;
+  ev.preventDefault();
+  ev.returnValue = "";            // browsers show their own confirm text
+}});
 
 const slot = () => `${{$("wk").value}}|${{$("sess").value}}|${{$("dt").value}}`;
 const bucket = () => (state[slot()] = state[slot()] || {{}});
@@ -222,8 +269,8 @@ function boot() {{
   $("wk").innerHTML = Array.from({{length: P.weeks}}, (_, i) =>
     `<option value="${{i + 1}}">Week ${{i + 1}}</option>`).join("");
   $("dt").value = new Date().toISOString().slice(0, 10);
-  $("note").textContent = "Entries stay in this browser. Export before you close the tab.";
   ["sess", "wk", "dt"].forEach(id => $(id).onchange = render);
+  flag();
   render();
 }}
 
@@ -332,7 +379,58 @@ $("export").onclick = () => {{
   $("out").textContent = r.length
     ? [COLS.join("\\t"), ...r.map(x => x.join("\\t"))].join("\\n")
     : "Nothing logged yet — tick a set first.";
+  if (r.length) {{ dirty = false; flag(); }}   // it exists outside the page now
   $("dlg").showModal();
+}};
+
+/* ---- import: rebuild session state from rows saved earlier ---- */
+function parse(text) {{
+  const out = [];
+  text.split(/\\r?\\n/).forEach(line => {{
+    if (!line.trim()) return;
+    // split on tabs, or on commas outside quotes
+    const cells = line.includes("\\t")
+      ? line.split("\\t")
+      : (line.match(/("([^"]|"")*"|[^,]*)(,|$)/g) || [])
+          .map(c => c.replace(/,$/, "").replace(/^"|"$/g, "").replace(/""/g, '"'))
+          .slice(0, -1);
+    const c = cells.map(x => String(x).trim());
+    if (!c.length || /^date$/i.test(c[0])) return;      // header or junk
+    out.push(c);
+  }});
+  return out;
+}}
+
+$("load").onclick = () => {{ $("impText").value = ""; $("imp").showModal(); }};
+$("impCancel").onclick = () => $("imp").close();
+$("impGo").onclick = () => {{
+  const r = parse($("impText").value);
+  let hit = 0, miss = 0;
+  r.forEach(c => {{
+    const [dt, wk, sess, ex, , , aSets, aReps, wt] = c;
+    const si = P.sessions.findIndex(s => s.name.toLowerCase() === String(sess).toLowerCase());
+    if (si < 0) {{ miss++; return; }}
+    const ei = P.sessions[si].exercises.findIndex(
+      e => e.name.toLowerCase() === String(ex).toLowerCase());
+    if (ei < 0) {{ miss++; return; }}
+    // point the controls at the row's own slot, then fill its sets
+    if (dt) $("dt").value = dt;
+    if (wk) $("wk").value = wk;
+    $("sess").value = String(si);
+    const b = (state[slot()] = state[slot()] || {{}});
+    const n = Math.max(1, Math.min(+aSets || 1, P.sessions[si].exercises[ei].sets || 1));
+    for (let k = 0; k < n; k++) {{
+      b[`${{ei}}|${{k}}`] = {{ w: +wt || null, r: +aReps || null, done: true }};
+    }}
+    hit++;
+  }});
+  try {{ localStorage.setItem(KEY, JSON.stringify(state)); }} catch {{ storable = false; }}
+  dirty = false;
+  $("imp").close();
+  render(); flag();
+  $("tally").innerHTML += miss
+    ? ` · loaded ${{hit}}, skipped ${{miss}} unmatched`
+    : ` · loaded ${{hit}}`;
 }};
 $("close").onclick = () => $("dlg").close();
 $("cp").onclick = async () => {{

@@ -7,15 +7,14 @@ complete profile. Most people quit a long intake.
 
 If the host renders HTML artifacts, emit `assets/intake.html` verbatim as an
 artifact instead of asking anything, and wait for the pasted block. It collects
-all seven blockers plus the optional extras, and emits them with schema key
+all ten blockers plus the optional extras, and emits them with schema key
 names. The questions below are the fallback for hosts that cannot.
 
 ## Fallback: the blockers, one question per message
 
 **Do not paste this list to the user.** Ask question 1, wait, acknowledge, ask
-question 2. Seven short exchanges. You genuinely cannot program without these
-seven answers, but asking for all of them at once produces a form people
-abandon.
+question 2. Ten short exchanges. You genuinely cannot program without these ten
+answers, but asking for all of them at once produces a form people abandon.
 
 Suggested wording, one at a time:
 
@@ -27,11 +26,13 @@ Suggested wording, one at a time:
 | 4 | "How long can a session be, door to door?" | Caps exercises per session. A 45-min cap changes the whole design. |
 | 5 | "Where do you train, and what equipment do you have?" | If they say "home gym", get the exact list and max dumbbell weight. |
 | 6 | "Any injuries, pain, or movements you avoid?" | Pain or a named injury routes to `safety.md` before anything else. |
-| 7 | "And how old are you?" | Recovery capacity, and it's the least invasive, so it goes last. |
+| 7 | "And how old are you?" | Recovery capacity and warm-up needs. |
+| 8 | "Sex?" | Realistic strength standards and recovery context. Female / male / other are all answers; this is asked, not assumed. |
+| 9–10 | "Height and weight? Either units." | Load prescription on bodyweight movements, and calorie context for fat loss. Store metric — convert for them. |
 
 Acknowledge each answer in a clause before the next question — "Three days
 works well for that" — so it reads as a conversation, not a loop. A progress
-marker like "(4 of 7)" makes the end visible.
+marker like "(4 of 10)" makes the end visible.
 
 If they answer several at once, absorb all of it and jump to the first question
 still unanswered. Re-asking something they already said is the fastest way to
@@ -40,7 +41,7 @@ feel like a form.
 "Realistically" is doing the work in #3. People report aspiration, not
 behaviour. If they say 6 days and have never trained, program 3–4 and say why.
 
-## The nice-to-haves — one optional batch, after the seven
+## The nice-to-haves — one optional batch, after the ten
 
 These are the exception to one-at-a-time: offer them together, once, in a
 message they can wave off in one word. Ask only what's relevant to what they
@@ -51,10 +52,6 @@ already told you:
   it doesn't.
 - **Job activity** — ask when programming leg volume or conditioning. A nurse
   on their feet 12 h and a desk worker do not get the same leg day.
-- **Bodyweight / height** — only needed for load prescriptions on bodyweight
-  movements, fat-loss context, or sport weight class. Optional; never insist.
-- **Sex** — optional, relevant mainly to realistic strength standards and
-  recovery context. Accept a skip without comment.
 - **Training history detail** — ask when "intermediate" is ambiguous. Best
   question: "What are your current working weights on squat, bench, deadlift,
   or the closest you do?" Numbers beat self-labels.
@@ -95,7 +92,7 @@ progression and you'll make fast gains for a while."
 ## Rules
 
 - Never invent an answer. Not asked = not known.
-- Accept "skip" on any nice-to-have without pushing. Ask the seven blockers one
+- Accept "skip" on any nice-to-have without pushing. Ask the ten blockers one
   at a time, and never as a pasted list.
 - Explain any jargon the first time: RIR, compound, deload, 1RM, volume.
 - State every assumption in the plan. "Assuming you can train Mon/Wed/Fri and
