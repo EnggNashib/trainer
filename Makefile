@@ -12,8 +12,9 @@ zip: clean
 check:
 	python3 scripts/validate_program.py scripts/example_program.json
 	python3 scripts/build_plan.py scripts/example_program.json --mobile --outdir /tmp/trainer-check
+	python3 scripts/build_logger.py scripts/example_program.json --outdir /tmp/trainer-check
 	@node --check /tmp/intake.js 2>/dev/null || true
-	@echo "ok — validator and stdlib plan build pass"
+	@echo "ok — validator, plan and logger build without dependencies"
 
 clean:
 	rm -f trainer.zip

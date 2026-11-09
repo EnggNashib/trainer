@@ -72,10 +72,14 @@ In Claude Code you can also invoke it directly as `/trainer`.
 
 | Deliverable | Needs | Status |
 | --- | --- | --- |
-| Mobile HTML plan | nothing (stdlib) | always works |
+| Interactive plan (HTML) | nothing (stdlib) | always works |
+| Interactive logger (HTML) | nothing (stdlib) | always works |
 | Validator | nothing (stdlib) | always works |
 | PDF plan | `reportlab` | `pip install reportlab` |
 | Excel tracker | `openpyxl` | `pip install openpyxl` |
+
+On claude.ai the two HTML deliverables are emitted as artifacts — they open in
+one click, and they are the two that cannot fail on a missing dependency.
 
 Both scripts exit non-zero with the exact install command if a dependency is
 missing — they never silently skip a deliverable.
@@ -98,6 +102,7 @@ trainer/
     ├── example_program.json    worked 4-day upper/lower
     ├── validate_program.py     the quality gate, stdlib only
     ├── build_plan.py           → PDF + mobile HTML
+    ├── build_logger.py         → interactive HTML logger, stdlib only
     └── build_tracker.py        → 6-sheet xlsx with live formulas
 ```
 
@@ -106,6 +111,7 @@ trainer/
 ```bash
 python3 scripts/validate_program.py scripts/example_program.json
 python3 scripts/build_plan.py    scripts/example_program.json --pdf --mobile --outdir /tmp
+python3 scripts/build_logger.py  scripts/example_program.json --outdir /tmp
 python3 scripts/build_tracker.py scripts/example_program.json --outdir /tmp
 ```
 

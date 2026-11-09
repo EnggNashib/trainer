@@ -96,6 +96,9 @@ def build_mobile(prog, out):
   @media (prefers-color-scheme: dark) {{
     :root {{ --ink:#E8EDEB; --accent:#7FC6A0; --muted:#9BAAA4; --line:#2B3633; --bg:#141A18; --card:#1B2321; }}
   }}
+  /* Artifact hosts stamp data-theme on the root; it must win in both directions. */
+  :root[data-theme="light"] {{ --ink:{INK}; --accent:{ACCENT}; --muted:{MUTED}; --line:#E3E8E6; --bg:#fff; --card:#fff; }}
+  :root[data-theme="dark"] {{ --ink:#E8EDEB; --accent:#7FC6A0; --muted:#9BAAA4; --line:#2B3633; --bg:#141A18; --card:#1B2321; }}
   * {{ box-sizing:border-box; }}
   body {{ margin:0; padding:16px 14px 64px; background:var(--bg); color:var(--ink);
     font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; max-width:760px; margin-inline:auto; }}

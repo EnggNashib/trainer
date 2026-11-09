@@ -1,6 +1,6 @@
 ---
 name: trainer
-description: "Evidence-based personal training. Assesses the individual, designs a periodized strength or physique program, and generates real deliverables — a printable PDF plan and a working Excel tracker with live formulas. Use when the user asks for a workout program, training plan, lifting routine, strength or hypertrophy programming, a workout log or tracker, progressive overload help, a deload, a program review, or says they want to get stronger, build muscle, lose fat, or train for a sport."
+description: "Evidence-based personal training. Assesses the individual, designs a periodized strength or physique program, and generates real deliverables — an interactive plan and set logger, a printable PDF, and a working Excel tracker with live formulas. Use when the user asks for a workout program, training plan, lifting routine, strength or hypertrophy programming, a workout log, logger or tracker, progressive overload help, a deload, a program review, or says they want to get stronger, build muscle, lose fat, or train for a sport."
 ---
 
 # trainer — evidence-based strength & physique programming
@@ -128,7 +128,7 @@ people don't know a plan and a log are different things.
 | Option | What it is |
 | --- | --- |
 | **A — Plan only** | What to train, when, how. For people who just want the program. |
-| **B — Tracker only** | A workbook to record what they actually did. For people who already have a program. |
+| **B — Logging only** | Somewhere to record what they actually did — a logger for the gym floor, a workbook for the history. For people who already have a program. |
 | **C — Both** *(recommended)* | The plan says what to do; the tracker records what happened and whether they're progressing. |
 
 Recommend C when they have no system yet. Respect A or B without re-pitching.
@@ -137,12 +137,27 @@ Recommend C when they have no system yet. Respect A or B without re-pitching.
 
 | Format | Best for | Produced by |
 | --- | --- | --- |
-| **PDF** | printable guide, exercise reference | `build_plan.py --pdf` |
-| **Mobile HTML** | following along in the gym | `build_plan.py --mobile` |
-| **Excel** | logging, weekly comparison, PRs, dashboard | `build_tracker.py` |
+| **Interactive plan** | reading it right now, no download | `build_plan.py --mobile`, emitted as an artifact |
+| **Interactive logger** | logging sets on the gym floor | `build_logger.py`, emitted as an artifact |
+| **PDF** | printing, keeping, sending to a coach | `build_plan.py --pdf` |
+| **Excel** | the durable record: weekly rollups, PRs, dashboard | `build_tracker.py` |
 
-Defaults to recommend: plan only → PDF (+ mobile). Tracker only → Excel.
-Both → PDF + Excel. **The user overrides you.** Offer, don't force.
+**On a host that renders artifacts, offer the interactive pair first** — they
+open in one click, need no dependencies, and work when `reportlab` and
+`openpyxl` are missing. Recommended defaults:
+
+| They chose | Offer |
+| --- | --- |
+| Plan only | interactive plan, + PDF if they want to print |
+| Tracker only | interactive logger **and** Excel — see the honesty note below |
+| Both | interactive plan + logger, + Excel |
+
+**Say this plainly when offering the logger:** it keeps entries in the browser,
+so it is for *during* the session, and the Excel workbook is the record that
+survives. Anyone training for more than a week wants the workbook too. Never
+present the logger as a replacement for it.
+
+**The user overrides you.** Offer, don't force.
 
 ## §5 Write program.json
 
@@ -175,12 +190,31 @@ not in the user's list, RIR out of range.
 ## §6 Generate
 
 ```bash
-# Plan: PDF + mobile HTML (reportlab required for PDF)
+# Plan: PDF + mobile HTML (reportlab required for PDF; --mobile is stdlib)
 python3 "$SKILL_DIR/scripts/build_plan.py" program.json --pdf --mobile --outdir .
+
+# Logger: self-contained HTML, stdlib only, never fails on dependencies
+python3 "$SKILL_DIR/scripts/build_logger.py" program.json --outdir .
 
 # Tracker: 6-sheet workbook with live formulas (openpyxl required)
 python3 "$SKILL_DIR/scripts/build_tracker.py" program.json --outdir .
 ```
+
+### Emitting the interactive deliverables as artifacts
+
+Both HTML files are built by a script and then **read and emitted verbatim** as
+HTML artifacts — one artifact each, never merged. Do not re-author, summarise or
+"improve" the markup: the whole point is that it was rendered from the validated
+`program.json`, so hand-written HTML would break the single-source-of-truth
+guarantee that keeps the plan and the tracker in agreement.
+
+- `<name>-plan-mobile.html` → the interactive plan
+- `<name>-logger.html` → the interactive logger
+
+The logger exports rows matching **columns A–L of the tracker's Log sheet**, in
+order, so what it produces pastes into the workbook with no rearranging. When
+you deliver both, say that explicitly — it is the workflow that makes the pair
+worth having.
 
 If a dependency is missing the script exits non-zero and prints the exact
 install command — relay it, don't silently skip the deliverable. `openpyxl` is
@@ -210,6 +244,10 @@ Check before you deliver. Any "no" means fix it, not ship it.
 - [ ] Progression rule is explicit and testable
 - [ ] Warm-up, deload trigger, and recovery are covered
 - [ ] Tracker separates **planned** from **actual** columns
+- [ ] Any interactive deliverable was emitted verbatim from the generated file,
+      not re-authored by hand
+- [ ] If a logger was delivered without the workbook, you said out loud that
+      browser entries are not a durable record
 - [ ] Every file you named actually exists on disk
 - [ ] No fabricated citation, no promised outcome
 
