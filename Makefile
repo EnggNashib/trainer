@@ -5,7 +5,9 @@
 zip: clean
 	cd .. && zip -rq trainer/trainer.zip trainer \
 	  -x 'trainer/.git/*' 'trainer/.gitignore' 'trainer/trainer.zip' '*.DS_Store' \
-	     'trainer/__pycache__/*' 'trainer/Makefile' 'trainer/install.sh'
+	     'trainer/__pycache__/*' 'trainer/Makefile' 'trainer/install.sh' \
+	     'trainer/.github/*' 'trainer/CONTRIBUTING.md' 'trainer/CODE_OF_CONDUCT.md' \
+	     'trainer/SECURITY.md'
 	@unzip -l trainer.zip | tail -3
 
 # Everything that can be verified without network or optional dependencies.

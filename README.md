@@ -1,5 +1,8 @@
 # trainer — evidence-based strength & physique programming
 
+[![ci](https://github.com/EnggNashib/trainer/actions/workflows/ci.yml/badge.svg)](https://github.com/EnggNashib/trainer/actions/workflows/ci.yml)
+[![license: MIT](https://img.shields.io/badge/license-MIT-2f6f4e.svg)](LICENSE)
+
 An agent skill that works like a strength coach rather than a workout
 generator: it assesses the person, explains the training strategy and gets
 agreement, asks what they actually want built, and then produces **real files**
@@ -143,7 +146,11 @@ prefix when written by a library and show up as `#NAME?` in Excel.
 
 ## Contributing
 
-Issues and pull requests welcome. The useful ones, in rough order:
+Fork it and modify it however you like — that's the license. Changes land here
+through a pull request; `main` is protected, so nothing merges without review.
+Full guide in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+The useful PRs, in rough order:
 
 - **Programming judgement** — volume landmarks, split selection, progression
   rules. These live in `references/programming.md` and are the substance of the
@@ -156,7 +163,9 @@ Issues and pull requests welcome. The useful ones, in rough order:
   of the `<script>`; add or reorder them there rather than touching the renderer.
 
 Run `make check` before opening a PR — it runs the validator and the
-dependency-free plan build. `make zip` rebuilds the release artifact.
+dependency-free builders. CI runs that on Python 3.9 and 3.12, then builds every
+deliverable with `reportlab` and `openpyxl` installed and asserts the files are
+non-empty. `make zip` rebuilds the release artifact.
 
 Keep the hard rules in `SKILL.md` intact. They exist because an agent that
 invents a citation, promises a result by a date, or claims a file exists before

@@ -1,0 +1,77 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  no-dependencies:
+    # The validator, the mobile plan and the logger must work with nothing
+    # installed — that is what makes them reliable in a sandbox with no network.
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: validator, plan and logger build on a bare interpreter
+        run: make check
+
+  with-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install reportlab openpyxl
+      - name: every deliverable builds
+        run: |
+          python3 scripts/build_plan.py    scripts/example_program.json --pdf --mobile --outdir out
+          python3 scripts/build_logger.py  scripts/example_program.json --outdir out
+          python3 scripts/build_tracker.py scripts/example_program.json --outdir out
+      - name: the files exist and are not empty
+        run: |
+          ls -l out
+          test -s out/example-client-plan.pdf
+          test -s out/example-client-plan-mobile.html
+          test -s out/example-client-logger.html
+          test -s out/example-client-tracker.xlsx
+      - name: the workbook opens and its sheets are present
+        run: |
+          python3 - <<'PY'
+          from openpyxl import load_workbook
+          wb = load_workbook("out/example-client-tracker.xlsx")
+          print("sheets:", wb.sheetnames)
+          assert len(wb.sheetnames) >= 5, wb.sheetnames
+          PY
+
+  javascript:
+    # The wizard and the logger ship JavaScript inside generated HTML; a syntax
+    # error there is invisible until someone opens the artifact.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 scripts/build_logger.py scripts/example_program.json --outdir out
+      - name: extract and syntax-check every inline script
+        run: |
+          python3 - <<'PY'
+          import pathlib, re
+          for src in ["assets/intake.html", "out/example-client-logger.html"]:
+              html = pathlib.Path(src).read_text()
+              js = re.search(r"<script>(.*)</script>", html, re.S).group(1)
+              out = pathlib.Path(src).with_suffix(".js").name
+              pathlib.Path(out).write_text(js)
+              print(f"{src} -> {out} ({len(js)} bytes)")
+          PY
+          for f in intake.js example-client-logger.js; do node --check "$f"; done
