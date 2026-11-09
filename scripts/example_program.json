@@ -1,0 +1,300 @@
+{
+  "client": {
+    "name": "Example Client",
+    "age": 32,
+    "height_cm": 178,
+    "weight_kg": 82,
+    "training_age": "intermediate",
+    "goal_primary": "Muscle building",
+    "goal_secondary": "Strength development",
+    "days_per_week": 4,
+    "session_minutes": 60,
+    "environment": "commercial gym",
+    "equipment": ["barbell", "dumbbells", "cables", "machines", "pull-up bar", "bench"],
+    "limitations": ["mild left shoulder discomfort on flat barbell bench"],
+    "sleep_hours": 7,
+    "activity_level": "desk job, ~6k steps/day",
+    "dislikes": ["burpees"],
+    "units": "kg"
+  },
+  "strategy": {
+    "split": "Upper / Lower, 4 days",
+    "rationale": "Four available days makes Upper/Lower the best fit: every muscle group is trained twice weekly, which beats a once-weekly body-part split at equal volume, and 60-minute sessions comfortably hold 5-6 exercises with proper rest. A PPL split would need 6 days to give the same frequency.",
+    "weekly_volume_notes": "Roughly 14-18 hard sets per major muscle group per week — mid-range for an intermediate lifter. Starting at the lower end so there is room to add volume across the block rather than starting maxed out.",
+    "progression_model": "Double progression. Hit the top of the prescribed rep range on all sets with clean technique, then add load (2.5 kg upper, 5 kg lower) and return to the bottom of the range.",
+    "deload_policy": "Week 7, or earlier if performance drops two weeks running. Deload = same exercises, same loads, half the sets.",
+    "assumptions": [
+      "Training Mon/Tue/Thu/Fri — adjust if your week looks different",
+      "Shoulder discomfort is non-acute and not under treatment; flat barbell bench is replaced with neutral-grip dumbbell pressing throughout",
+      "Access to a standard commercial gym with no equipment queueing problems",
+      "No medical restriction on heavy lower-body loading"
+    ]
+  },
+  "block": {
+    "name": "Hypertrophy Block 1",
+    "weeks": 8,
+    "start_date": "2026-11-10",
+    "review_after_weeks": 4
+  },
+  "sessions": [
+    {
+      "day": "Mon",
+      "name": "Upper A",
+      "focus": "Horizontal push / pull emphasis",
+      "warmup": [
+        "5 min bike or row, easy",
+        "Band pull-aparts 2x15",
+        "Shoulder CARs or arm circles 30s each direction",
+        "Ramp-up sets on first press: empty/light, 40%, 60%, 80%"
+      ],
+      "exercises": [
+        {
+          "name": "Neutral-grip dumbbell bench press",
+          "pattern": "horizontal push",
+          "muscles": ["chest", "triceps", "front delts"],
+          "sets": 4, "reps": "6-10", "rest_sec": 150, "rir": "2",
+          "load_guidance": "Start where 8 reps feels like 2 left in the tank",
+          "cues": "Shoulder blades down and back; elbows ~45 degrees from torso",
+          "alternative": "Machine chest press (neutral grip)",
+          "note": "Neutral grip substituted for flat barbell to spare the left shoulder"
+        },
+        {
+          "name": "Chest-supported row",
+          "pattern": "horizontal pull",
+          "muscles": ["mid back", "lats", "biceps"],
+          "sets": 4, "reps": "8-12", "rest_sec": 120, "rir": "2",
+          "load_guidance": "No torso swing — the chest pad is the honesty check",
+          "cues": "Lead with the elbow; pull to the lower ribs",
+          "alternative": "Seated cable row"
+        },
+        {
+          "name": "Lat pulldown",
+          "pattern": "vertical pull",
+          "muscles": ["lats", "biceps"],
+          "sets": 3, "reps": "10-14", "rest_sec": 90, "rir": "2",
+          "cues": "Drive elbows down to the pockets; full stretch at the top",
+          "alternative": "Assisted pull-up"
+        },
+        {
+          "name": "Seated dumbbell shoulder press",
+          "pattern": "vertical push",
+          "muscles": ["delts", "triceps"],
+          "sets": 3, "reps": "8-12", "rest_sec": 120, "rir": "2",
+          "cues": "Ribs down; don't lean back into it",
+          "alternative": "Landmine press"
+        },
+        {
+          "name": "Cable lateral raise",
+          "pattern": "isolation",
+          "muscles": ["side delts"],
+          "sets": 3, "reps": "12-20", "rest_sec": 60, "rir": "1",
+          "cues": "Lead with the elbow; stop at shoulder height",
+          "alternative": "Dumbbell lateral raise"
+        },
+        {
+          "name": "Cable triceps pushdown",
+          "pattern": "isolation",
+          "muscles": ["triceps"],
+          "sets": 3, "reps": "10-15", "rest_sec": 60, "rir": "1",
+          "cues": "Elbows pinned to your sides",
+          "alternative": "Overhead rope extension"
+        }
+      ],
+      "cooldown": ["3-5 min easy walk", "Doorway pec stretch 30s/side", "Lat stretch 30s/side"]
+    },
+    {
+      "day": "Tue",
+      "name": "Lower A",
+      "focus": "Squat emphasis",
+      "warmup": [
+        "5 min bike",
+        "Leg swings 10/side, hip airplanes 5/side",
+        "Bodyweight squats 2x10",
+        "Ramp-up sets on squat: empty bar, 40%, 60%, 80%"
+      ],
+      "exercises": [
+        {
+          "name": "Back squat",
+          "pattern": "squat",
+          "muscles": ["quads", "glutes", "adductors"],
+          "sets": 4, "reps": "5-8", "rest_sec": 180, "rir": "2",
+          "load_guidance": "Heaviest lift of the week — take the full rest",
+          "cues": "Brace before you descend; chest up through the drive",
+          "alternative": "Hack squat or leg press"
+        },
+        {
+          "name": "Romanian deadlift",
+          "pattern": "hinge",
+          "muscles": ["hamstrings", "glutes", "low back"],
+          "sets": 3, "reps": "8-12", "rest_sec": 150, "rir": "2",
+          "cues": "Push the hips back; stop where the hamstrings run out, not the floor",
+          "alternative": "Dumbbell RDL or 45-degree back extension"
+        },
+        {
+          "name": "Bulgarian split squat",
+          "pattern": "single-leg",
+          "muscles": ["quads", "glutes"],
+          "sets": 3, "reps": "8-12 per leg", "rest_sec": 90, "rir": "2",
+          "cues": "Torso tall; weight through the front heel",
+          "alternative": "Walking lunge or step-up"
+        },
+        {
+          "name": "Seated leg curl",
+          "pattern": "isolation",
+          "muscles": ["hamstrings"],
+          "sets": 3, "reps": "10-15", "rest_sec": 75, "rir": "1",
+          "cues": "Control the return — don't let it snap back",
+          "alternative": "Lying leg curl or Nordic curl eccentrics"
+        },
+        {
+          "name": "Standing calf raise",
+          "pattern": "isolation",
+          "muscles": ["calves"],
+          "sets": 4, "reps": "10-15", "rest_sec": 60, "rir": "1",
+          "cues": "Full stretch at the bottom, pause at the top",
+          "alternative": "Leg press calf raise"
+        }
+      ],
+      "cooldown": ["5 min easy walk", "Couch stretch 45s/side", "Hamstring stretch 30s/side"]
+    },
+    {
+      "day": "Thu",
+      "name": "Upper B",
+      "focus": "Vertical push / pull emphasis",
+      "warmup": [
+        "5 min row",
+        "Band pull-aparts 2x15, band dislocates 10",
+        "Ramp-up sets on first press"
+      ],
+      "exercises": [
+        {
+          "name": "Incline dumbbell press",
+          "pattern": "horizontal push",
+          "muscles": ["upper chest", "front delts", "triceps"],
+          "sets": 4, "reps": "8-12", "rest_sec": 150, "rir": "2",
+          "cues": "30-45 degree bench; elbows tucked slightly",
+          "alternative": "Incline machine press",
+          "note": "Incline and neutral/semi-neutral grip keep the shoulder comfortable"
+        },
+        {
+          "name": "Pull-up (assisted if needed)",
+          "pattern": "vertical pull",
+          "muscles": ["lats", "biceps", "mid back"],
+          "sets": 4, "reps": "5-10", "rest_sec": 150, "rir": "2",
+          "load_guidance": "Add load once you clear 10 clean reps",
+          "cues": "Dead hang start; full range beats extra reps",
+          "alternative": "Lat pulldown"
+        },
+        {
+          "name": "Single-arm dumbbell row",
+          "pattern": "horizontal pull",
+          "muscles": ["lats", "mid back"],
+          "sets": 3, "reps": "8-12 per side", "rest_sec": 90, "rir": "2",
+          "cues": "No rotation through the torso",
+          "alternative": "Seated cable row (single arm)"
+        },
+        {
+          "name": "Cable chest fly",
+          "pattern": "isolation",
+          "muscles": ["chest"],
+          "sets": 3, "reps": "12-15", "rest_sec": 75, "rir": "1",
+          "cues": "Soft elbows, fixed angle; squeeze without shrugging",
+          "alternative": "Pec deck"
+        },
+        {
+          "name": "Face pull",
+          "pattern": "isolation",
+          "muscles": ["rear delts", "upper back"],
+          "sets": 3, "reps": "15-20", "rest_sec": 60, "rir": "1",
+          "cues": "Pull to the forehead; externally rotate at the end",
+          "alternative": "Reverse pec deck",
+          "note": "Shoulder-friendly volume — keep these in"
+        },
+        {
+          "name": "Incline dumbbell curl",
+          "pattern": "isolation",
+          "muscles": ["biceps"],
+          "sets": 3, "reps": "10-14", "rest_sec": 60, "rir": "1",
+          "cues": "Full stretch at the bottom",
+          "alternative": "Cable curl"
+        }
+      ],
+      "cooldown": ["3-5 min easy walk", "Pec and lat stretch 30s each"]
+    },
+    {
+      "day": "Fri",
+      "name": "Lower B",
+      "focus": "Hinge emphasis",
+      "warmup": [
+        "5 min bike",
+        "Glute bridges 2x12, leg swings 10/side",
+        "Ramp-up sets on deadlift"
+      ],
+      "exercises": [
+        {
+          "name": "Trap-bar deadlift",
+          "pattern": "hinge",
+          "muscles": ["glutes", "hamstrings", "quads", "back"],
+          "sets": 4, "reps": "4-6", "rest_sec": 210, "rir": "2",
+          "load_guidance": "Heaviest pull of the week; reset each rep",
+          "cues": "Push the floor away; lats engaged",
+          "alternative": "Conventional deadlift or rack pull"
+        },
+        {
+          "name": "Hip thrust",
+          "pattern": "hinge",
+          "muscles": ["glutes", "hamstrings"],
+          "sets": 3, "reps": "8-12", "rest_sec": 120, "rir": "2",
+          "cues": "Ribs down, chin tucked; pause at the top",
+          "alternative": "Glute bridge or 45-degree back extension"
+        },
+        {
+          "name": "Leg press",
+          "pattern": "squat",
+          "muscles": ["quads", "glutes"],
+          "sets": 3, "reps": "10-15", "rest_sec": 120, "rir": "2",
+          "cues": "Don't let the low back round at the bottom",
+          "alternative": "Hack squat or goblet squat"
+        },
+        {
+          "name": "Walking lunge",
+          "pattern": "single-leg",
+          "muscles": ["quads", "glutes"],
+          "sets": 3, "reps": "10-12 per leg", "rest_sec": 90, "rir": "2",
+          "cues": "Controlled step; knee tracks over the foot",
+          "alternative": "Reverse lunge or step-up"
+        },
+        {
+          "name": "Hanging leg raise",
+          "pattern": "core",
+          "muscles": ["abs", "hip flexors"],
+          "sets": 3, "reps": "8-15", "rest_sec": 60, "rir": "1",
+          "cues": "Posteriorly tilt the pelvis; no swinging",
+          "alternative": "Cable crunch or dead bug"
+        },
+        {
+          "name": "Seated calf raise",
+          "pattern": "isolation",
+          "muscles": ["soleus"],
+          "sets": 3, "reps": "12-20", "rest_sec": 60, "rir": "1",
+          "cues": "Slow eccentric, full stretch",
+          "alternative": "Standing calf raise"
+        }
+      ],
+      "cooldown": ["5 min easy walk", "Hip flexor and hamstring stretch 30s/side"]
+    }
+  ],
+  "benchmarks": [
+    { "metric": "Back squat 5RM", "how": "Work up to a clean top set of 5 with 1 RIR", "every_weeks": 4, "baseline": "record in week 1" },
+    { "metric": "Trap-bar deadlift 5RM", "how": "Top set of 5, technique must hold", "every_weeks": 4 },
+    { "metric": "Pull-up max reps", "how": "One all-out set, strict form", "every_weeks": 4 },
+    { "metric": "Session consistency", "how": "Sessions completed divided by sessions planned — the dashboard calculates it", "every_weeks": 1 },
+    { "metric": "Bodyweight trend", "how": "Weekly average, same conditions; single readings are noise", "every_weeks": 1 }
+  ],
+  "recovery": {
+    "sleep": "7 hours is workable; 8 would noticeably improve recovery at this volume. If sleep drops below 6 for a week, cut the last set of each isolation exercise rather than pushing through.",
+    "nutrition_note": "Muscle gain needs a small calorie surplus and roughly 1.6-2.2 g protein per kg bodyweight per day. This is general guidance, not a meal plan.",
+    "deload_trigger": "Week 7 as scheduled, or earlier if performance declines two weeks in a row, joints ache persistently, or sleep degrades.",
+    "notes": "A desk job with ~6k steps means low baseline activity. Adding 2-3k steps daily will help recovery and body composition more than adding training volume."
+  }
+}

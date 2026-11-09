@@ -1,0 +1,500 @@
+<title>Training intake</title>
+<style>
+  :root {
+    --bg: #f6f7f5;
+    --card: #ffffff;
+    --ink: #1f2933;
+    --muted: #6b7a74;
+    --line: #e2e6e1;
+    --accent: #2f6f4e;
+    --accent-ink: #ffffff;
+    --accent-soft: #eaf2ed;
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171a;
+      --card: #1d2125;
+      --ink: #e8eae8;
+      --muted: #9aa6a1;
+      --line: #2e343a;
+      --accent: #5fb98a;
+      --accent-ink: #10231a;
+      --accent-soft: #223029;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #f6f7f5; --card: #ffffff; --ink: #1f2933; --muted: #6b7a74;
+    --line: #e2e6e1; --accent: #2f6f4e; --accent-ink: #ffffff; --accent-soft: #eaf2ed;
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171a; --card: #1d2125; --ink: #e8eae8; --muted: #9aa6a1;
+    --line: #2e343a; --accent: #5fb98a; --accent-ink: #10231a; --accent-soft: #223029;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  body {
+    margin: 0;
+    padding: 24px 16px 48px;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.5 ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; }
+
+  .masthead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .masthead h1 { font-size: 15px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--muted); margin: 0; }
+  .step-count { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .dots { display: flex; gap: 6px; margin-bottom: 18px; }
+  .dot { height: 4px; flex: 1; border-radius: 99px; background: var(--line); transition: background .25s ease; }
+  .dot.done { background: var(--accent); }
+  .dot.current { background: var(--accent); opacity: .55; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 26px 22px 22px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px -16px rgba(0,0,0,.18);
+  }
+  .q { font-size: 21px; font-weight: 600; line-height: 1.3; margin: 0 0 6px; letter-spacing: -.01em; }
+  .hint { font-size: 14px; color: var(--muted); margin: 0 0 18px; }
+  .hint:empty { display: none; margin: 0 0 10px; }
+  .sub { font-size: 13px; font-weight: 600; color: var(--muted); margin: 20px 0 8px; letter-spacing: .02em; text-transform: uppercase; }
+
+  .opts { display: grid; gap: 8px; }
+  .opts.tight { grid-template-columns: repeat(auto-fit, minmax(74px, 1fr)); }
+  .opt {
+    display: flex; align-items: center; gap: 10px;
+    width: 100%; text-align: left;
+    font: inherit; color: inherit;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease, transform .06s ease;
+  }
+  .opts.tight .opt { justify-content: center; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .opt:hover { border-color: var(--accent); }
+  .opt:active { transform: translateY(1px); }
+  .opt[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+  .opt .key {
+    flex: 0 0 auto; font-size: 11px; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 4px;
+    min-width: 17px; height: 17px; display: grid; place-items: center;
+  }
+  .opts.tight .opt .key { display: none; }
+  .opt .lbl { flex: 1; }
+  .opt .note { display: block; font-size: 13px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+
+  input[type="text"], input[type="number"], textarea {
+    width: 100%; box-sizing: border-box;
+    font: inherit; color: inherit;
+    background: var(--bg);
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 11px 13px;
+  }
+  input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+  .opt:focus-visible, button.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  textarea { min-height: 76px; resize: vertical; }
+  .fieldrow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .fieldrow label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 5px; }
+
+  .nav { display: flex; align-items: center; gap: 10px; margin-top: 22px; }
+  .nav .spacer { flex: 1; }
+  button.btn {
+    font: inherit; font-weight: 600;
+    border-radius: 10px; padding: 11px 20px;
+    cursor: pointer; border: 1px solid var(--line);
+    background: transparent; color: var(--ink);
+    transition: opacity .15s ease, border-color .15s ease;
+  }
+  button.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  button.btn.ghost { border: none; color: var(--muted); padding-left: 8px; padding-right: 8px; }
+  button.btn:disabled { opacity: .4; cursor: not-allowed; }
+
+  .done-head { display: flex; align-items: center; gap: 9px; margin-bottom: 4px; }
+  .tick { width: 20px; height: 20px; flex: 0 0 auto; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+  pre.out {
+    margin: 0; padding: 14px;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+    font: 12.5px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    white-space: pre; overflow-x: auto; max-height: 300px; overflow-y: auto;
+  }
+  .summary { list-style: none; padding: 0; margin: 0 0 18px; font-size: 14px; }
+  .summary li { display: flex; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+  .summary li:last-child { border-bottom: none; }
+  .summary .k { flex: 0 0 38%; color: var(--muted); }
+  .summary .v { flex: 1; font-weight: 500; }
+  .foot { font-size: 12.5px; color: var(--muted); text-align: center; margin-top: 16px; }
+  .copied { color: var(--accent); font-weight: 600; }
+</style>
+
+<div class="wrap">
+  <div class="masthead">
+    <h1>Training intake</h1>
+    <span class="step-count" id="count"></span>
+  </div>
+  <div class="dots" id="dots"></div>
+  <div class="card" id="card"></div>
+  <p class="foot" id="foot">Nothing is sent anywhere — this page runs entirely in your browser.</p>
+</div>
+
+<script>
+/* ---------------------------------------------------------------------------
+   Steps are declarative so this file stays easy to edit. Each step writes one
+   or more keys into `client`, which is emitted at the end as the `client`
+   object of program.json — same key names as scripts/program_schema.json, so
+   the answers drop straight in with no translation.
+   type: choice | number | text | combo | extras
+--------------------------------------------------------------------------- */
+const STEPS = [
+  {
+    key: "goal_primary",
+    type: "choice",
+    q: "What's the main goal?",
+    hint: "Pick the one that matters most right now — the program is built around it.",
+    options: [
+      { v: "strength",       l: "Get stronger",       n: "Heavier lifts, lower reps" },
+      { v: "hypertrophy",    l: "Build muscle",       n: "Size and shape" },
+      { v: "fat loss",       l: "Lose fat",           n: "Keep muscle while leaning out" },
+      { v: "endurance",      l: "Endurance",          n: "Conditioning and work capacity" },
+      { v: "sport",          l: "Sport performance",  n: "Train for a specific sport" },
+      { v: "general health", l: "General health",     n: "Feel good, stay capable" }
+    ]
+  },
+  {
+    key: "training_age",
+    type: "choice",
+    q: "How long have you been training consistently?",
+    hint: "Consistently means structured sessions most weeks — not just gym membership.",
+    options: [
+      { v: "beginner",     l: "Under 6 months",      n: "Or I can still add weight most sessions" },
+      { v: "intermediate", l: "6 months to 2 years", n: "Progress now takes weeks, not sessions" },
+      { v: "advanced",     l: "2+ years structured", n: "Progress measured over months" },
+      { v: "beginner",     l: "Coming back after a break", n: "Trained before, out for a while" }
+    ]
+  },
+  {
+    key: "days_per_week",
+    type: "choice",
+    numeric: true,
+    tight: true,
+    q: "How many days a week can you realistically train?",
+    hint: "Realistically. A plan you follow 3 days beats one you abandon at 6.",
+    options: [
+      { v: 2, l: "2" }, { v: 3, l: "3" }, { v: 4, l: "4" }, { v: 5, l: "5" }, { v: 6, l: "6" }
+    ]
+  },
+  {
+    key: "session_minutes",
+    type: "choice",
+    numeric: true,
+    tight: true,
+    q: "How long can a session be?",
+    hint: "Door to door, including warm-up.",
+    options: [
+      { v: 30, l: "30m" }, { v: 45, l: "45m" }, { v: 60, l: "60m" },
+      { v: 75, l: "75m" }, { v: 90, l: "90m" }
+    ]
+  },
+  {
+    type: "combo",
+    q: "Where do you train, and what do you have?",
+    hint: "Equipment decides exercise selection more than anything else here.",
+    envKey: "environment",
+    env: [
+      { v: "commercial gym",   l: "Commercial gym",  n: "Full racks, machines, dumbbells" },
+      { v: "home gym",         l: "Home gym",        n: "Tell me exactly what's in it below" },
+      { v: "limited equipment",l: "Limited kit",     n: "A few pieces, improvising" },
+      { v: "bodyweight only",  l: "Bodyweight only", n: "No external load" }
+    ],
+    eqKey: "equipment",
+    eq: ["barbell", "squat rack", "bench", "dumbbells", "kettlebells", "cable machine",
+         "leg press", "pull-up bar", "dip bars", "resistance bands", "treadmill / bike", "none"],
+    extraKey: "equipment_note",
+    extraLabel: "Anything else, or max dumbbell weight"
+  },
+  {
+    key: "limitations",
+    type: "text",
+    q: "Any injuries, pain, or movements you avoid?",
+    hint: "One per line. This is the one answer I will not guess at — I work around it or refer you out.",
+    placeholder: "e.g. left shoulder impingement, no overhead press\nlow back sore after deadlifts",
+    skipLabel: "Nothing to report",
+    skipValue: []
+  },
+  {
+    key: "age",
+    type: "number",
+    q: "And how old are you?",
+    hint: "Affects recovery capacity and warm-up, nothing else.",
+    min: 10, max: 100, placeholder: "e.g. 34"
+  },
+  {
+    type: "extras",
+    q: "Anything else worth knowing?",
+    hint: "All optional — skip the whole thing if you'd rather just start.",
+    fields: [
+      { key: "sex",            l: "Sex",                 type: "text",   ph: "optional" },
+      { key: "height_cm",      l: "Height (cm)",         type: "number", ph: "optional" },
+      { key: "weight_kg",      l: "Weight (kg)",         type: "number", ph: "optional" },
+      { key: "sleep_hours",    l: "Sleep (hrs/night)",   type: "number", ph: "optional" },
+      { key: "activity_level", l: "Job activity",        type: "text",   ph: "desk / on my feet" },
+      { key: "name",           l: "Name on the plan",    type: "text",   ph: "optional" }
+    ],
+    routineLabel: "What are you doing right now?",
+    routinePh: "e.g. 3x a week full body, bench 60kg x5",
+    dislikesLabel: "Anything you hate doing? (one per line)",
+    dislikesPh: "e.g. burpees\nrunning",
+    unitsKey: "units"
+  }
+];
+
+const client = {};
+const notes = {};           // free text that isn't a schema key
+let i = 0;                  // current step index
+let draft = null;           // in-progress answer for the current step
+
+const card  = document.getElementById("card");
+const dots  = document.getElementById("dots");
+const count = document.getElementById("count");
+const foot  = document.getElementById("foot");
+
+const esc = s => String(s).replace(/[&<>"']/g, c => (
+  { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const lines = s => String(s || "").split("\n").map(x => x.trim()).filter(Boolean);
+const num = v => (v === "" || v === null || v === undefined || isNaN(+v)) ? null : +v;
+
+function chrome() {
+  dots.innerHTML = STEPS.map((_, n) =>
+    `<div class="dot ${n < i ? "done" : n === i ? "current" : ""}"></div>`).join("");
+  count.textContent = i < STEPS.length ? `Step ${i + 1} of ${STEPS.length}` : "Done";
+}
+
+function optionList(opts, sel, tight, multi) {
+  return `<div class="opts ${tight ? "tight" : ""}">` + opts.map((o, n) => {
+    const on = multi ? sel.includes(o.v) : sel === n;
+    return `<button class="opt" type="button" aria-pressed="${on}" data-n="${n}">
+      ${tight ? "" : `<span class="key">${n + 1}</span>`}
+      <span class="lbl">${esc(o.l)}${o.n ? `<span class="note">${esc(o.n)}</span>` : ""}</span>
+    </button>`;
+  }).join("") + `</div>`;
+}
+
+function render() {
+  if (i >= STEPS.length) return finish();
+  const s = STEPS[i];
+  chrome();
+
+  let body = "";
+  if (s.type === "choice") {
+    if (draft === null) draft = -1;
+    body = optionList(s.options, draft, s.tight, false);
+  } else if (s.type === "text") {
+    if (draft === null) draft = "";
+    body = `<textarea id="f" placeholder="${esc(s.placeholder || "")}">${esc(draft)}</textarea>`;
+  } else if (s.type === "number") {
+    if (draft === null) draft = "";
+    body = `<input id="f" type="number" min="${s.min}" max="${s.max}"
+             placeholder="${esc(s.placeholder || "")}" value="${esc(draft)}">`;
+  } else if (s.type === "combo") {
+    if (draft === null) draft = { env: -1, eq: [], extra: "" };
+    body = optionList(s.env, draft.env, false, false)
+      + `<div class="sub">Available equipment</div>`
+      + `<div class="opts tight" id="eq">` + s.eq.map((e, n) =>
+          `<button class="opt" type="button" aria-pressed="${draft.eq.includes(e)}" data-e="${n}">${esc(e)}</button>`
+        ).join("") + `</div>`
+      + `<div class="sub">${esc(s.extraLabel)}</div>`
+      + `<input id="x" type="text" placeholder="e.g. dumbbells up to 30 kg" value="${esc(draft.extra)}">`;
+  } else if (s.type === "extras") {
+    if (draft === null) draft = { f: {}, routine: "", dislikes: "", units: "kg" };
+    body = `<div class="fieldrow">` + s.fields.map(f =>
+        `<div><label for="e_${f.key}">${esc(f.l)}</label>
+         <input id="e_${f.key}" type="${f.type}" placeholder="${esc(f.ph)}" value="${esc(draft.f[f.key] || "")}"></div>`
+      ).join("") + `</div>`
+      + `<div class="sub">Units for the plan</div>`
+      + `<div class="opts tight" id="units">` +
+        ["kg", "lb"].map(u => `<button class="opt" type="button" aria-pressed="${draft.units === u}" data-u="${u}">${u}</button>`).join("")
+      + `</div>`
+      + `<div class="sub">${esc(s.routineLabel)}</div>`
+      + `<input id="routine" type="text" placeholder="${esc(s.routinePh)}" value="${esc(draft.routine)}">`
+      + `<div class="sub">${esc(s.dislikesLabel)}</div>`
+      + `<textarea id="dislikes" placeholder="${esc(s.dislikesPh)}">${esc(draft.dislikes)}</textarea>`;
+  }
+
+  const optional = s.type === "extras";
+  card.innerHTML = `
+    <h2 class="q">${esc(s.q)}</h2>
+    <p class="hint">${esc(s.hint || "")}</p>
+    ${body}
+    <div class="nav">
+      ${i > 0 ? `<button class="btn" id="back" type="button">Back</button>` : ""}
+      <div class="spacer"></div>
+      ${s.skipLabel ? `<button class="btn ghost" id="skip" type="button">${esc(s.skipLabel)}</button>` : ""}
+      ${optional ? `<button class="btn ghost" id="skip" type="button">Skip</button>` : ""}
+      <button class="btn primary" id="next" type="button">${i === STEPS.length - 1 ? "Finish" : "Next"}</button>
+    </div>`;
+  wire(s);
+}
+
+function wire(s) {
+  const next = card.querySelector("#next");
+  const back = card.querySelector("#back");
+  const skip = card.querySelector("#skip");
+
+  const ready = () => {
+    if (s.type === "choice") return draft >= 0;
+    if (s.type === "combo")  return draft.env >= 0 && (draft.eq.length > 0 || s.env[draft.env].v === "bodyweight only");
+    if (s.type === "number") return num(draft) !== null && +draft >= s.min && +draft <= s.max;
+    if (s.type === "text")   return lines(draft).length > 0;
+    return true;
+  };
+  const sync = () => { next.disabled = !ready(); };
+
+  card.querySelectorAll(".opts:not(#eq):not(#units) .opt").forEach(b => {
+    b.onclick = () => {
+      const n = +b.dataset.n;
+      if (s.type === "choice") draft = n; else draft.env = n;
+      card.querySelectorAll(".opts:not(#eq):not(#units) .opt")
+          .forEach(o => o.setAttribute("aria-pressed", +o.dataset.n === n));
+      sync();
+      if (s.type === "choice") setTimeout(commit, 130);   // single-select advances itself
+    };
+  });
+  card.querySelectorAll("#eq .opt").forEach(b => {
+    b.onclick = () => {
+      const e = s.eq[+b.dataset.e];
+      const at = draft.eq.indexOf(e);
+      if (at >= 0) draft.eq.splice(at, 1); else draft.eq.push(e);
+      b.setAttribute("aria-pressed", at < 0);
+      sync();
+    };
+  });
+  card.querySelectorAll("#units .opt").forEach(b => {
+    b.onclick = () => {
+      draft.units = b.dataset.u;
+      card.querySelectorAll("#units .opt").forEach(o => o.setAttribute("aria-pressed", o.dataset.u === b.dataset.u));
+    };
+  });
+
+  const f = card.querySelector("#f");
+  if (f) {
+    f.oninput = () => { draft = f.value; sync(); };
+    f.onkeydown = ev => {
+      if (ev.key === "Enter" && (s.type === "number" || ev.metaKey || ev.ctrlKey)) { ev.preventDefault(); if (ready()) commit(); }
+    };
+    f.focus();
+  }
+  const x = card.querySelector("#x");
+  if (x) x.oninput = () => { draft.extra = x.value; };
+  if (s.type === "extras") {
+    s.fields.forEach(fd => {
+      const el = card.querySelector("#e_" + fd.key);
+      el.oninput = () => { draft.f[fd.key] = el.value; };
+    });
+    card.querySelector("#routine").oninput  = e => { draft.routine = e.target.value; };
+    card.querySelector("#dislikes").oninput = e => { draft.dislikes = e.target.value; };
+  }
+
+  if (back) back.onclick = () => { i--; draft = null; render(); };
+  if (skip) skip.onclick = () => { draft = s.skipValue !== undefined ? s.skipValue : null; store(s, true); i++; draft = null; render(); };
+  next.onclick = () => { if (ready()) commit(); };
+  sync();
+}
+
+/* number keys pick an option on single-select steps */
+document.addEventListener("keydown", ev => {
+  if (i >= STEPS.length) return;
+  const s = STEPS[i];
+  if (s.type !== "choice" || !/^[1-9]$/.test(ev.key)) return;
+  if (document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  const n = +ev.key - 1;
+  if (n < s.options.length) { draft = n; render(); setTimeout(commit, 130); }
+});
+
+function store(s, skipped) {
+  if (s.type === "choice") {
+    const o = s.options[draft];
+    if (o) client[s.key] = s.numeric ? +o.v : o.v;
+    if (s.key === "training_age" && o && /coming back/i.test(o.l)) notes.training_age = "returning after a layoff";
+  } else if (s.type === "number") {
+    const v = num(draft); if (v !== null) client[s.key] = Math.round(v);
+  } else if (s.type === "text") {
+    client[s.key] = skipped ? (s.skipValue || []) : lines(draft);
+  } else if (s.type === "combo") {
+    const e = s.env[draft.env];
+    if (e) client[s.envKey] = e.v;
+    client[s.eqKey] = draft.eq.filter(x => x !== "none");
+    if (draft.extra.trim()) notes.equipment = draft.extra.trim();
+  } else if (s.type === "extras") {
+    if (skipped) { client.units = "kg"; return; }
+    const map = { height_cm: "n", weight_kg: "n", sleep_hours: "n" };
+    s.fields.forEach(fd => {
+      const raw = (draft.f[fd.key] || "").trim();
+      if (!raw) return;
+      client[fd.key] = map[fd.key] === "n" || fd.type === "number" ? num(raw) : raw;
+      if (client[fd.key] === null) delete client[fd.key];
+    });
+    client.units = draft.units || "kg";
+    if (draft.dislikes.trim()) client.dislikes = lines(draft.dislikes);
+    if (draft.routine.trim()) notes.current_routine = draft.routine.trim();
+  }
+}
+
+function commit() { store(STEPS[i], false); i++; draft = null; render(); }
+
+function finish() {
+  chrome();
+  const json = JSON.stringify({ client }, null, 2);
+  const extra = Object.entries(notes);
+  const payload = json + (extra.length
+    ? "\n\nAlso worth knowing:\n" + extra.map(([k, v]) => `- ${k.replace(/_/g, " ")}: ${v}`).join("\n")
+    : "");
+
+  const label = {
+    goal_primary: "Goal", training_age: "Experience", days_per_week: "Days / week",
+    session_minutes: "Session length", environment: "Trains at", equipment: "Equipment",
+    limitations: "Limitations", age: "Age"
+  };
+  const show = v => Array.isArray(v) ? (v.length ? v.join(", ") : "none") : String(v);
+  const rows = Object.keys(label).filter(k => client[k] !== undefined)
+    .map(k => `<li><span class="k">${label[k]}</span><span class="v">${esc(show(client[k]))}</span></li>`).join("");
+
+  card.innerHTML = `
+    <div class="done-head"><span class="tick">&check;</span><h2 class="q" style="margin:0">That's everything</h2></div>
+    <p class="hint">Copy the block below and paste it back into the chat — I'll build the strategy from it.</p>
+    <ul class="summary">${rows}</ul>
+    <pre class="out" id="out">${esc(payload)}</pre>
+    <div class="nav">
+      <button class="btn" id="back" type="button">Back</button>
+      <div class="spacer"></div>
+      <button class="btn primary" id="copy" type="button">Copy for chat</button>
+    </div>`;
+  foot.textContent = "Nothing is sent anywhere — copy the block above to continue.";
+
+  card.querySelector("#back").onclick = () => { i = STEPS.length - 1; draft = null; render(); };
+  card.querySelector("#copy").onclick = async (ev) => {
+    const btn = ev.currentTarget;
+    try {
+      await navigator.clipboard.writeText(payload);
+      btn.textContent = "Copied";
+      btn.classList.add("copied");
+      setTimeout(() => { btn.textContent = "Copy for chat"; btn.classList.remove("copied"); }, 1600);
+    } catch {
+      const r = document.createRange();
+      r.selectNodeContents(document.getElementById("out"));
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      btn.textContent = "Selected — press ⌘C";
+    }
+  };
+}
+
+render();
+</script>

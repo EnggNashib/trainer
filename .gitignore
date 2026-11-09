@@ -1,0 +1,11 @@
+.DS_Store
+
+# release artifact — built by `make zip`, attached to GitHub Releases
+trainer.zip
+
+# generated deliverables, if someone runs the skill inside the repo
+program.json
+*.xlsx
+*.pdf
+*-mobile.html
+__pycache__/
